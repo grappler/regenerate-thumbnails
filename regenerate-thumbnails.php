@@ -97,7 +97,7 @@ class RegenerateThumbnails {
 
 	// Add a "Regenerate Thumbnails" link to the media row actions
 	public function add_regenerate_link_to_media_list_view( $actions, $post ) {
-		if ( 'image/' != substr( $post->post_mime_type, 0, 6 ) || ! current_user_can( $this->capability ) )
+		if ( 'image/' != substr( $post->post_mime_type, 0, 6 ) || ! current_user_can( $this->capability ) || ! file_is_displayable_image( get_attached_file( $post->ID ) ) )
 			return $actions;
 
 		$url = wp_nonce_url( admin_url( 'tools.php?page=regenerate-thumbnails&goback=1&ids=' . $post->ID ), 'regenerate-thumbnails' );
@@ -112,7 +112,7 @@ class RegenerateThumbnails {
 	public function add_button_to_media_edit_page() {
 		global $post;
 
-		if ( 'image/' != substr( $post->post_mime_type, 0, 6 ) || ! current_user_can( $this->capability ) ) {
+		if ( 'image/' != substr( $post->post_mime_type, 0, 6 ) || ! current_user_can( $this->capability ) || ! file_is_displayable_image( get_attached_file( $post->ID ) ) ) {
 			return;
 		}
 
@@ -135,6 +135,10 @@ class RegenerateThumbnails {
 	 * @return array The new array of form fields.
 	 */
 	public function add_button_to_edit_media_modal_fields_area( $form_fields, $post ) {
+		if ( 'image/' != substr( $post->post_mime_type, 0, 6 ) || ! current_user_can( $this->capability ) || ! file_is_displayable_image( get_attached_file( $post->ID ) ) ) {
+			return $form_fields;
+		}
+
 		$form_fields['regenerate_thumbnails'] = array(
 			'label'         => '',
 			'input'         => 'html',
